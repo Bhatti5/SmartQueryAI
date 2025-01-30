@@ -15,14 +15,39 @@ if st.button("Ask AI"):
                 "http://127.0.0.1:5000/ask",
                 json={"question": question}
             )
+
             # Check for a successful response
             if response.status_code == 200:
-                # Extract response content
-                ai_response = response.json().get("response", "No response received.")
+                data = response.json()
+
+                # Extract AI response
+                ai_response = data.get("response", "No response received.")
+                evaluation = data.get("evaluation", "No evaluation available.")
+                references = data.get("references", [])
+
+                # Display AI response
+                st.subheader("🤖 AI Response:")
                 st.success(ai_response)
+
+                # Display evaluation
+                # st.subheader("📝 AI Evaluation:")
+                # st.info(evaluation)
+
+                # Display references (if available)
+                if references:
+                    st.subheader("🔗 References:")
+                    for ref in references:
+                        title = ref.get("title", "Reference")
+                        url = ref.get("url", "#")
+                        st.markdown(f"- [{title}]({url})")
+                else:
+                    st.warning("No references found.")
+
             else:
                 st.error(f"Error: Received status code {response.status_code}")
+
         except Exception as e:
             st.error(f"Failed to connect to backend: {e}")
+
     else:
         st.warning("Please enter a question before asking.")
